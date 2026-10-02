@@ -1,0 +1,36 @@
+Nature and decoration models (from Poly Pizza):
+  pine1: by Quaternius (CC0 1.0) https://poly.pizza/m/79gmlLnweB
+  pine2: by Quaternius (CC0 1.0) https://poly.pizza/m/699sFuLCN2
+  pine3: by Quaternius (CC0 1.0) https://poly.pizza/m/rfnxJv0Rqa
+  palm1: by Quaternius (CC0 1.0) https://poly.pizza/m/A6cKJYFsIb
+  palm2: by Quaternius (CC0 1.0) https://poly.pizza/m/DsrrAYmucG
+  broad1: by Quaternius (CC0 1.0) https://poly.pizza/m/qZtx0AHhcy
+  broad2: by Quaternius (CC0 1.0) https://poly.pizza/m/aVOxaHRPWe
+  broad3: by Quaternius (CC0 1.0) https://poly.pizza/m/k6cozoNfLH
+  cycad: by Isa Lousberg (CC0 1.0) https://poly.pizza/m/kZiJbxzogy
+  horsetail: by Poly by Google (CC-BY 3.0) https://poly.pizza/m/9uT74BMpRrl
+  fern: by Quaternius (CC0 1.0) https://poly.pizza/m/jqcanvH7D6
+  bush: by Quaternius (CC0 1.0) https://poly.pizza/m/ooG6CkLyE8
+  flowerbush: by Quaternius (CC0 1.0) https://poly.pizza/m/BVYSNurXMV
+  flowers1: by Quaternius (CC0 1.0) https://poly.pizza/m/hfPzQAedOe
+  flowers2: by Quaternius (CC0 1.0) https://poly.pizza/m/LqTljN6Wg2
+  grass: by Quaternius (CC0 1.0) https://poly.pizza/m/JSIYtscPmP
+  rock1: by Quaternius (CC0 1.0) https://poly.pizza/m/HtpdTh3Ld6
+  rock2: by Quaternius (CC0 1.0) https://poly.pizza/m/54jZKTAt5p
+  mushrooms: by Quaternius (CC0 1.0) https://poly.pizza/m/mxDOl0n6zt
+  toadstool: by Quaternius (CC0 1.0) https://poly.pizza/m/db1tjMhmiA
+  butterfly1: by Poly by Google (CC-BY 3.0) https://poly.pizza/m/2ZwYwkTVnfG
+  butterfly2: by sirkitree (CC-BY 3.0) https://poly.pizza/m/fv6J8XW4hvC
+  bee: by Quaternius (CC0 1.0) https://poly.pizza/m/HvfIku26CK
+  hive: by Tipatat Chennavasin (CC-BY 3.0) https://poly.pizza/m/66sVQZVUjX2
+  turtle: by Poly by Google (CC-BY 3.0) https://poly.pizza/m/2LCcq8vhqJ3
+  crocodile: by jeremy (CC-BY 3.0) https://poly.pizza/m/fnUp2MrGjmr
+  ribcage: by Quaternius (CC0 1.0) https://poly.pizza/m/A67un3x9nV
+  egg: by Quaternius (CC0 1.0) https://poly.pizza/m/ngjyRi84lk
+  shell: by Kenney (CC0 1.0) https://poly.pizza/m/eWHAc3Pq8z
+  volcano: by Poly by Google (CC-BY 3.0) https://poly.pizza/m/4xoTMiF0D5J
+  meteor: by Quaternius (CC0 1.0) https://poly.pizza/m/VNIRoibtQv
+  lamp: by Kay Lousberg (CC0 1.0) https://poly.pizza/m/ZSQ65S4lEu
+  bench: by Quaternius (CC0 1.0) https://poly.pizza/m/jLxjFxFRpw
+  flag: by Quaternius (CC0 1.0) https://poly.pizza/m/onAi7dx56P
+  fountain: by Isa Lousberg (CC0 1.0) https://poly.pizza/m/WHc7dwttlk
