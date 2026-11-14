@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dino Maths">
+<meta name="robots" content="noindex">
+<title>Dino Maths</title>
+<style>
+:root{--cell:min(10vw,7.5vh,76px);--g:#2e7d32;--ink:#263238}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{font-family:ui-rounded,"SF Pro Rounded","Arial Rounded MT Bold",system-ui,sans-serif;color:var(--ink);background:linear-gradient(#c5e1a5,#fff8e1 55%) fixed;touch-action:manipulation;-webkit-user-select:none;user-select:none;overflow-x:hidden}
+#app{max-width:980px;margin:0 auto;padding:max(10px,env(safe-area-inset-top)) 14px 30px}
+button{font:inherit;color:inherit;border:none;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+input,textarea{font:inherit;-webkit-user-select:text;user-select:text}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.top h1{flex:1;font-size:clamp(22px,4.2vw,36px);margin:0;text-align:center}
+.ibtn{width:58px;height:58px;flex:none;border-radius:16px;background:#fff;box-shadow:0 3px 0 #0002;font-size:28px}
+.eggs{display:flex;justify-content:center;gap:4px;margin:2px auto 10px;flex-wrap:wrap;background:#8d6e63;border-radius:30px;padding:6px 14px;width:fit-content;max-width:100%}
+.egg{font-size:clamp(22px,4vw,30px);opacity:.55;filter:grayscale(1) brightness(1.1);transition:transform .3s,opacity .3s}
+.egg.on{opacity:1;filter:none;transform:scale(1.12)}
+.stage{background:#ffffffd9;border-radius:24px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 4px 0 #0001}
+.prompt{font-size:clamp(24px,4.4vw,36px);font-weight:800;text-align:center;line-height:1.25}
+.sub{font-size:clamp(18px,3vw,24px);text-align:center;color:#546e7a}
+.big{font-size:clamp(44px,9vw,76px);font-weight:900;letter-spacing:1px;text-align:center}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:720px}
+.opts.two{grid-template-columns:repeat(2,1fr);max-width:440px}
+.opt{height:clamp(74px,12vw,100px);border-radius:22px;background:#fff;font-size:clamp(34px,6.4vw,52px);font-weight:900;box-shadow:0 6px 0 #0003;border:3px solid #e0e0e0}
+.opt:active{transform:translateY(3px);box-shadow:0 3px 0 #0003}
+.opt.right{background:#a5d6a7;border-color:#43a047}
+.opt.wrong{background:#eceff1;color:#b0bec5;box-shadow:none;border-color:#eceff1}
+.help{background:#fff3e0;border:3px dashed #ffb74d;border-radius:20px;padding:12px;font-size:clamp(19px,3.3vw,26px);text-align:center;width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;line-height:1.3}
+.praise{font-size:clamp(26px,5vw,40px);font-weight:900;color:var(--g);text-align:center;min-height:1.35em;margin-top:10px}
+.row{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.lbl{font-size:clamp(16px,2.6vw,20px);color:#6d4c41;text-align:center;font-weight:700}
+.plus{font-size:clamp(34px,6vw,52px);font-weight:900}
+/* ten-frame */
+.tf{display:inline-grid;grid-template-columns:repeat(5,var(--cell));grid-auto-rows:var(--cell);gap:4px;padding:6px;background:#8d6e63;border-radius:14px;position:relative}
+.tf.sm{--cell:min(6.4vw,5vh,40px)}
+.tf .c{background:#efebe9;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.tf .c.e{box-shadow:inset 0 0 0 4px #ffb300;animation:pulse 1s infinite}
+.dot{width:74%;height:74%;border-radius:50%}
+.dot.a{background:radial-gradient(circle at 35% 35%,#a5d6a7,#2e7d32)}
+.dot.b{background:radial-gradient(circle at 35% 35%,#ffe0b2,#ef6c00)}
+.dot.x{animation:pulse 1s infinite;box-shadow:0 0 0 4px #ffb300}
+.cover{position:absolute;inset:0;background:repeating-linear-gradient(45deg,#689f38,#689f38 14px,#7cb342 14px,#7cb342 28px);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:calc(var(--cell)*1.1)}
+@keyframes pulse{50%{transform:scale(.88)}}
+/* part-whole */
+.pw{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:26px 46px;justify-items:center;padding:4px 10px}
+.pw .w{grid-column:1/3}
+.pw svg{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.circ{position:relative;z-index:1;width:clamp(84px,15vw,120px);height:clamp(84px,15vw,120px);border-radius:50%;background:#fff;border:6px solid #43a047;display:flex;align-items:center;justify-content:center;font-size:clamp(38px,7vw,58px);font-weight:900}
+.circ.q{border-style:dashed;border-color:#ef6c00;color:#ef6c00}
+.pw.sm .circ{width:66px;height:66px;font-size:32px;border-width:4px}
+.pw.sm{gap:14px 26px}
+/* dienes */
+.rods{display:flex;align-items:flex-end;gap:8px;padding:8px;flex-wrap:wrap;justify-content:center}
+.rod{display:grid;grid-template-rows:repeat(10,1fr);gap:2px;width:clamp(18px,3vw,24px);height:clamp(180px,30vw,240px);padding:2px;background:#0d47a1;border-radius:4px}
+.rod i,.cubes i{display:block;background:#64b5f6;border-radius:2px}
+.cubes{display:grid;grid-template-columns:repeat(2,clamp(18px,3vw,24px));gap:5px;margin-left:10px}
+.cubes i{height:clamp(18px,3vw,24px);box-shadow:inset 0 0 0 2px #0d47a1}
+/* hundred square */
+.hund{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;width:100%;max-width:640px}
+.hund div{background:#fff;border:2px solid #cfd8dc;border-radius:7px;text-align:center;font-weight:800;font-size:clamp(16px,3vw,24px);padding:6px 0;min-height:2.1em}
+.hund .me{background:#a5d6a7;border-color:#2e7d32}
+.hund .gap{background:#eceff1}
+.hund .tq{background:#ffe0b2;border-color:#ef6c00;color:#ef6c00}
+.hund .path{background:#fff9c4}
+/* column */
+.colw{display:grid;grid-template-columns:repeat(3,clamp(56px,10vw,80px));gap:4px;font-size:clamp(40px,8vw,64px);font-weight:900;text-align:center}
+.colw div{height:clamp(58px,10.5vw,84px);display:flex;align-items:center;justify-content:center;border-radius:12px}
+.colw .h{font-size:clamp(20px,3.4vw,28px);color:#6d4c41}
+.colw .hl{background:#fff59d}
+.colw .carry{font-size:clamp(24px,4vw,34px);color:#ef6c00}
+.colw .line{height:6px;background:#37474f;grid-column:1/4;border-radius:3px}
+.colw .ans{border:3px dashed #b0bec5}
+/* home */
+.today{display:block;width:100%;padding:18px;border-radius:26px;background:linear-gradient(#ff8a65,#f4511e);color:#fff;box-shadow:0 6px 0 #bf360c;margin:6px 0 16px;text-align:center}
+.today b{display:block;font-size:clamp(26px,5vw,40px)}
+.today span{font-size:clamp(17px,2.8vw,22px);opacity:.95}
+.map{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (max-width:560px){.map{grid-template-columns:1fr}}
+.step{display:flex;align-items:center;gap:12px;background:#fff;border-radius:20px;padding:12px;box-shadow:0 4px 0 #0002;text-align:left;width:100%;position:relative}
+.step .ic{font-size:40px;width:56px;text-align:center;flex:none}
+.step .t{font-size:clamp(19px,3vw,24px);font-weight:900}
+.step .s{font-size:clamp(14px,2.2vw,17px);color:#607d8b}
+.step .st{font-size:20px;letter-spacing:2px;color:#ffb300}
+.step .n{position:absolute;top:-8px;left:-6px;background:#5d4037;color:#fff;border-radius:50%;width:28px;height:28px;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.step.lock{opacity:.5}
+.step.next{box-shadow:0 0 0 4px #ff7043,0 4px 0 #0002}
+.tag{display:inline-block;background:#ff7043;color:#fff;border-radius:10px;padding:1px 8px;font-size:14px;margin-left:6px;vertical-align:middle}
+.tag.cls{background:#42a5f5}
+.foot{text-align:center;margin-top:16px;font-size:18px;color:#5d4037}
+/* snap */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:720px}
+.card{aspect-ratio:3/4;border-radius:18px;background:#fff;border:4px solid #a1887f;box-shadow:0 5px 0 #0003;display:flex;align-items:center;justify-content:center;font-size:clamp(46px,9vw,76px);font-weight:900;transition:opacity .4s,transform .2s}
+.card.sel{border-color:#ff7043;transform:translateY(-6px);background:#fff3e0}
+.card.gone{opacity:0;pointer-events:none;transform:scale(.6)}
+.card .tf{--cell:min(4.4vw,3.4vh,26px);gap:2px;padding:3px}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+/* hatch + nest */
+.bigegg{font-size:clamp(120px,26vw,200px);background:none;line-height:1.1}
+.wob{animation:wob .5s}
+@keyframes wob{25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+.dino{font-size:clamp(110px,22vw,170px);line-height:1.1;animation:pop .6s}
+@keyframes pop{0%{transform:scale(.2)}70%{transform:scale(1.15)}}
+.nest{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.nest div{background:#fff;border-radius:18px;padding:10px;text-align:center;box-shadow:0 3px 0 #0002;font-size:16px}
+.nest b{display:block;font-size:19px}
+.nest span{font-size:64px;display:block}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.pbtn{padding:16px 24px;border-radius:20px;background:#43a047;color:#fff;font-size:clamp(20px,3.4vw,26px);font-weight:900;box-shadow:0 5px 0 #1b5e20}
+.pbtn.alt{background:#fff;color:var(--ink);box-shadow:0 5px 0 #0003}
+.stars{font-size:clamp(40px,8vw,60px);color:#ffb300;letter-spacing:6px}
+/* grown-ups */
+.gu{background:#fff;border-radius:20px;padding:16px 18px;margin-bottom:14px;font-size:17px;line-height:1.45;-webkit-user-select:text;user-select:text}
+.gu h2{margin:0 0 8px;font-size:22px}
+.gu h3{margin:14px 0 4px;font-size:18px}
+.gu ol{padding-left:22px;margin:6px 0}
+.gu li{margin-bottom:10px}
+.gu small{color:#607d8b}
+.gu code{font-size:14px;background:#f1f8e9;padding:1px 4px;border-radius:4px;word-break:break-word}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #eee}
+.sw button{padding:10px 16px;border-radius:12px;background:#e8f5e9;font-weight:800}
+.sw button.on{background:#43a047;color:#fff}
+.hold{touch-action:none;padding:22px 30px;border-radius:22px;background:#fff;font-size:22px;font-weight:900;box-shadow:0 5px 0 #0003;position:relative;overflow:hidden}
+.hold i{position:absolute;left:0;bottom:0;height:8px;background:#43a047;width:0}
+.ovl{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:10;padding:16px}
+.ovl .box{background:#fff;border-radius:24px;padding:22px;max-width:460px;width:100%;text-align:center;display:flex;flex-direction:column;gap:14px}
+.ovl input{font-size:28px;padding:10px;border-radius:14px;border:3px solid #a5d6a7;text-align:center}
+@media (orientation:landscape) and (max-height:820px){
+ .stage{gap:9px;padding:10px 12px}
+ .big{font-size:clamp(36px,7vh,60px)}
+ .top{margin-bottom:4px}.eggs{margin-bottom:6px}
+ .opt{height:clamp(64px,10vh,84px)}
+ .rod{height:clamp(150px,26vh,220px)}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+'use strict';
+/*GEN-START*/
+// ---------- question makers (pure: no page code, so they can be tested on their own) ----------
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+// four different answers: the right one plus likely mistakes, all inside lo..hi
+function choices(ans,cands,lo,hi){
+  const out=[ans],seen=new Set([ans]);
+  const add=c=>{if(out.length<4&&Number.isInteger(c)&&c>=lo&&c<=hi&&!seen.has(c)){seen.add(c);out.push(c);}};
+  shuffle(cands.slice()).forEach(add);
+  for(let d=1;out.length<4&&d<60;d++){add(ans+d);add(ans-d);}
+  return shuffle(out);
+}
+const GEN={
+  flash(p,i){
+    const n=p?p.n:R(1,9),ans=10-n;
+    return {lvl:'flash',key:'f'+n,p:{n},n,steps:[{text:'How many more make 10?',say:'How many more make ten?',ans,opts:choices(ans,[n,ans+1,ans-1,ans+2],0,10)}]};
+  },
+  bonds(p,i){
+    let W,a,hide;
+    if(p)({W,a,hide}=p); else {
+      if(i<4){W=R(5,10);a=R(1,W-1);}
+      else {W=R(11,18);a=Math.random()<0.4?10:R(W-9,9);}   // to 20 through ten: 14 = 10 + 4, 15 = 9 + 6
+      hide=pick(['p','p','a','w']);
+    }
+    const b=W-a,ans=hide==='w'?W:hide==='a'?a:b;
+    return {lvl:'bonds',key:`b${W}-${a}-${hide}`,p:{W,a,hide},W,a,b,hide,steps:[{
+      text:hide==='w'?'How many altogether?':'What is the missing part?',
+      say:hide==='w'?`${a} and ${b} make how many?`:hide==='a'?`What and ${b} make ${W}?`:`${a} and what make ${W}?`,
+      ans,opts:choices(ans,[ans+1,ans-1,hide==='a'?b:a,W,ans+2],0,20)}]};
+  },
+  doubles(p,i){
+    let a,b;
+    if(p)({a,b}=p); else if(i<4){a=R(1,10);b=a;} else {a=R(2,9);b=a+1;if(Math.random()<0.5)[a,b]=[b,a];}
+    const ans=a+b,lo=Math.min(a,b);
+    return {lvl:'doubles',key:`d${a}+${b}`,p:{a,b},a,b,lo,near:a!==b,steps:[{text:`${a} + ${b} = ?`,say:`${a} plus ${b}`,ans,opts:choices(ans,[ans+1,ans-1,2*lo+2,ans+2,ans-2],0,20)}]};
+  },
+  make10(p,i,o){
+    const adv=!!(o&&o.adv);   // 2+ stars on this step: fewer pictures, some plain sums
+    if((p&&p.t3)||(!p&&adv&&i===7)){   // three numbers: spot the pair that makes 10
+      let a,c,order;
+      if(p)({a,c,order}=p); else {a=R(1,9);c=R(1,9);order=shuffle([a,10-a,c]);}
+      const ans=10+c;
+      return {lvl:'make10',key:`m3:${Math.min(a,10-a)}+${c}`,p:{t3:1,a,c,order},three:true,a,c,order,ans,steps:[{kind:'three',text:`${order.join(' + ')} = ?`,sub:'Find two numbers that make 10 first!',say:`${order.join(' plus ')}. Find two numbers that make ten first!`,ans,opts:choices(ans,[ans-1,ans+1,ans+10,c],0,30)}]};
+    }
+    let x,y;
+    if(p)({x,y}=p); else {x=R(2,9);y=R(Math.max(2,11-x),9);}
+    const big=Math.max(x,y),small=Math.min(x,y),need=10-big,rest=small-need,ans=x+y,steps=[];
+    if(adv&&i>=5)return {lvl:'make10',key:`m${small}+${big}`,p:{x,y},x,y,big,small,need,rest,ans,plain:true,pic:false,
+      steps:[{kind:'plain',text:`${x} + ${y} = ?`,say:`${x} plus ${y}`,ans,opts:choices(ans,[ans-1,ans+1,ans-2,ans+10],0,30)}]};
+    if(x<y)steps.push({kind:'bigger',text:'Which number goes in the nest first?',sub:'Tap the bigger one!',say:'Which number goes in the nest first? Tap the bigger one!',ans:big,opts:shuffle([x,y])});
+    steps.push({kind:'fill',text:`${big} and how many more make 10?`,say:`${big} and how many more make ten?`,ans:need,opts:choices(need,[need+1,need-1,small,rest],0,10)});
+    steps.push({kind:'split',text:`Split the ${small}: ${small} = ${need} + ?`,say:`${small} is ${need} and what?`,ans:rest,opts:choices(rest,[rest+1,rest-1,small,need],0,10)});
+    steps.push({kind:'ten',text:`10 + ${rest} = ?`,say:`ten plus ${rest}`,ans,opts:choices(ans,[ans-1,ans+1,ans+10,rest],0,30)});
+    return {lvl:'make10',key:`m${small}+${big}`,p:{x,y},x,y,big,small,need,rest,ans,pic:i<(adv?2:4),steps};
+  },
+  tens(p,i){
+    let f,t,o;
+    if(p)({f,t,o}=p); else {
+      f=['B','B','C','C','A','A',pick(['D','E']),pick(['D','E'])][Math.min(i,7)];
+      t=(f==='B'||f==='C')?1:f==='A'?R(1,4):R(2,9);
+      o=(f==='A'||f==='D')?R(0,9):R(1,9);
+    }
+    const n=10*t+o;let st;
+    if(f==='A')st={text:'How many altogether?',say:'How many altogether? Count the tens first.',ans:n,opts:choices(n,[n+10,n-10,10*o+t,n+1,n-1],1,99)};
+    else if(f==='B')st={text:`10 + ${o} = ?`,say:`ten plus ${o}`,ans:n,opts:choices(n,[o,n+1,n-1,n+10,o+1],0,30)};
+    else if(f==='C')st={text:`10 + ? = ${n}`,say:`ten plus what makes ${n}?`,ans:o,opts:choices(o,[n,o+1,o-1,10],0,30)};
+    else if(f==='D')st={text:`${10*t} + ${o} = ?`,say:`${10*t} plus ${o}`,ans:n,opts:choices(n,[t+o,n+10,n-10,n+1],0,99)};
+    else st={text:`${n} = ${10*t} + ?`,say:`${n} is ${10*t} and what?`,ans:o,opts:choices(o,[t,o+1,o-1,n],0,99)};
+    return {lvl:'tens',key:`t${f}${n}`,p:{f,t,o},f,t,o,n,steps:[st]};
+  },
+  tenmore(p,i){
+    let n,d;
+    if(p)({n,d}=p); else {d=i<3?10:i<6?-10:pick([20,-20,30]);do{n=R(1,99);}while(n+d<1||n+d>100);}
+    const ans=n+d,word=d>0?`${d} more than ${n}`:`${-d} less than ${n}`;
+    return {lvl:'tenmore',key:`x${n}${d>0?'+':''}${d}`,p:{n,d},n,d,steps:[{text:`What is ${word}?`,say:`What is ${word}?`,ans,opts:choices(ans,[n+1,n-1,n-d,ans+1,ans-1],1,100)}]};
+  },
+  column(p,i,o){
+    let a,b;
+    if(p)({a,b}=p); else if(i<3){a=R(2,9);b=R(Math.max(2,10-a),9);}   // 8 + 6 in columns, the way her class does it
+    else if(i<5){const aO=R(2,9);a=R(1,8)*10+aO;b=R(10-aO,9);}
+    else {const carry=Math.random()<0.7,aO=R(1,9),bO=carry?R(10-aO,9):R(0,9-aO),aT=R(1,7),bT=R(1,8-aT);a=aT*10+aO;b=bT*10+bO;}
+    const aT=Math.floor(a/10),aO=a%10,bT=Math.floor(b/10),bO=b%10,os=aO+bO,c=os>=10?1:0,ts=aT+bT+c;
+    if(o&&o.adv&&i>=6)return {lvl:'column',key:`c${a}+${b}`,p:{a,b},a,b,aT,aO,bT,bO,os,c,ts,ans:a+b,plain:true,
+      steps:[{kind:'plain',text:`${a} + ${b} = ?`,say:`${a} plus ${b}. Ones first!`,ans:a+b,opts:choices(a+b,[a+b-10,a+b+10,a+b-1,a+b+1],0,99)}]};
+    return {lvl:'column',key:`c${a}+${b}`,p:{a,b},a,b,aT,aO,bT,bO,os,c,ts,ans:a+b,steps:[
+      {kind:'ones',text:`Ones first: ${aO} + ${bO} = ?`,say:`Start with the ones. ${aO} plus ${bO}`,ans:os,opts:choices(os,[os+1,os-1,os-10,os+10],0,18)},
+      {kind:'tens',text:c&&!aT&&!bT?'Tens: just the 1 you carried = ?':c?`Tens: ${aT} + ${bT} + the 1 you carried = ?`:`Tens: ${aT} + ${bT} = ?`,say:c&&!aT&&!bT?'Now the tens. There is just the 1 you carried':c?`Now the tens. ${aT} plus ${bT}, plus the 1 you carried`:`Now the tens. ${aT} plus ${bT}`,ans:ts,opts:choices(ts,[ts-1,ts+1,aT+bT+(c?0:1),ts+2],0,9)}]};
+  }
+};
+// Snap to 10 board: 4 pairs that make 10 (8 cards). Pairs the child found hard come first.
+function snapBoard(tricky){
+  const base=shuffle([1,2,3,4,5]);
+  const want=[...new Set(tricky.filter(a=>a>=1&&a<=5))].slice(0,2);
+  const pairs=[...want,...base.filter(a=>!want.includes(a))].slice(0,4);
+  const cards=[];
+  pairs.forEach(a=>{cards.push(a);cards.push(10-a);});
+  return shuffle(cards).map((v,k)=>({id:k,v,dots:Math.random()<0.3}));
+}
+/*GEN-END*/
+
+// ---------- the steps (in teaching order) ----------
+const SHEETS='the school worksheets folder → Year 2 → Maths → Year 2 → ';
+const LV=[
+ {id:'flash',icon:'🔟',title:'Ten-Frame Flash',sub:'How many more make 10?',
+  teach:'Pairs that make 10, seen at a glance: 7 dots means 3 empty spaces. The frame is hidden after a moment so she has to see it, not count it.',
+  ready:'A 🏅, and she answers without counting the dots.',
+  home:'Cut two cups off a 12-egg box to make a ten-frame. Drop in a few coins, show it for a second, ask "how many more make 10?"',
+  sheets:['Addition/complete-the-number-bonds.pdf','Addition/number-fact-families-within-10.pdf']},
+ {id:'snap',icon:'🃏',title:'Snap to 10',sub:'Find two cards that make 10',
+  teach:'Instant recall of the five pairs: 1+9, 2+8, 3+7, 4+6, 5+5.',
+  ready:'Clears the boards with no more than one wrong tap.',
+  home:'Play Pairs with real cards (Ace to 9): a pair is two cards that make 10.',
+  sheets:['Addition/complete-the-number-bonds.pdf','Addition/matching-number-facts-within-20.pdf']},
+ {id:'bonds',icon:'🔺',title:'Number Bonds',sub:'Find the missing part',
+  teach:'Part-whole (the same circles as the workbook): 8 is 5 and 3; 15 is 9 and 6. Bonds to 10 first, then to 20.',
+  ready:'A 🏅 on this step.',
+  home:'Hide some of 10 toys under a cup: "There were 10, I can see 6, how many are hiding?"',
+  sheets:['Addition/complete-the-number-bonds-to-8.pdf','Addition/complete-the-number-bonds-to-9.pdf','Addition/number-fact-families-within-20.pdf','Addition/complete-number-fact-families-within-20.pdf']},
+ {id:'doubles',icon:'🎲',title:'Doubles',sub:'Double, then one more',
+  teach:'Doubles to 10 + 10, then near-doubles: 6 + 7 is double 6 and one more.',
+  ready:'A 🏅 on this step.',
+  home:'Roll two dice; a double scores a bonus. Say "double 4 is 8" out loud.',
+  sheets:['Addition/addition-facts-showing-commutativity.pdf','Addition/doubling-amounts-within-20p.pdf']},
+ {id:'make10',icon:'🥚',title:'Make 10',sub:'Fill the nest to 10 first',
+  teach:'How to KNOW 8 + 5 without fingers: 8 + 2 = 10, then 10 + 3 = 13 (the "adding by making 10" method in My Pals 1A). Her class now writes such sums in columns; this step is what tells her the 13 to write (3 in the ones, carry the 1). Uses steps 1–3.',
+  ready:'A 🏅 here is the sign finger-counting is no longer needed for single-digit sums.',
+  home:'Egg-box ten-frame and two colours of coins: show 8 + 5, fill the box first, then see what is left over.',
+  sheets:['Addition/addition-of-three-one-digit-numbers.pdf (spot the two numbers that make 10 first)','Addition/addition-to-20-using-tens-and-ones.pdf']},
+ {id:'tens',icon:'🧱',title:'Tens and Ones',sub:'10 and some more',cls:true,
+  teach:'Place value: 14 is 10 + 4, 37 is 30 + 7.',
+  ready:'A 🏅 on this step.',
+  home:'Bundle straws or lolly sticks in tens with a rubber band.',
+  sheets:['Addition/addition-to-20-using-tens-and-ones.pdf','Addition/recognising-partitioning-in-addition-within-50.pdf','Addition/addition-of-2-digit-numbers-and-tens.pdf']},
+ {id:'tenmore',icon:'💯',title:'Ten More, Ten Less',sub:'Jump up and down the 100 square',cls:true,
+  teach:'10 more / 10 less on the 100 square (the class topic at the end of October).',
+  ready:'A 🏅 on this step.',
+  home:'Print a 100 square; hop a toy dinosaur down a row for +10 and up a row for −10.',
+  sheets:['Addition/identifying-ten-more-and-ten-less.pdf','Counting/counting-on-and-back-in-tens.pdf']},
+ {id:'column',icon:'🦖',title:'Big Dino Sums',sub:'Ones first, then regroup',cls:true,
+  teach:'Column addition with regrouping, the way her class teaches it: starts with sums like 8 + 6 in columns (14 → write 4 in the ones, carry the 1 to the tens), then 27 + 5, then 38 + 25. The ones step still needs 8 + 6 = 14 known without fingers, which is what steps 1–5 build.',
+  ready:'A 🏅 on this step.',
+  home:'Same straw bundles: when the loose ones reach 10, band them into a new ten.',
+  sheets:['Addition/introduction-to-column-addition-with-carrying.pdf','Addition/adding-two-digit-and-one-digit-numbers-with-carrying.pdf','Addition/column-addition-of-two-2-digit-numbers-with-carrying.pdf']}
+];
+const LVI=Object.fromEntries(LV.map((l,i)=>[l.id,i]));
+
+// ---------- saved progress ----------
+const KEY='dinoMaths.v1';
+function fresh(){return {v:1,name:null,stars:{},three:{},plays:{},nest:[],tricky:{},voice:true,sound:true,flash:1500,openAll:false,focus:'auto',log:[]};}
+const today_=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1)return Object.assign(fresh(),s);}catch(e){}return fresh();}
+let S=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+// ---------- sound + voice ----------
+try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}
+let AC=null;
+function tone(f,t,d,ty){const o=AC.createOscillator(),g=AC.createGain();o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.22,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+0.05);}
+function sfx(kind){
+  if(!S.sound)return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state!=='running')AC.resume();
+    const n=AC.currentTime+0.02;
+    const seq={good:[[660,0,.12],[880,.1,.2]],bad:[[392,0,.12],[330,.1,.2]],pop:[[990,0,.07]],
+      hatch:[[523,0,.14],[659,.12,.14],[784,.24,.14],[1047,.36,.4]],crack:[[300,0,.06,'square']]}[kind]||[];
+    seq.forEach(([f,t,d,ty])=>tone(f,n+t,d,ty));
+  }catch(e){}
+}
+let VOICE=null;
+function getVoice(){if(VOICE||!window.speechSynthesis)return VOICE;const vs=speechSynthesis.getVoices();VOICE=vs.find(v=>/en-GB/i.test(v.lang)&&/Kate|Serena|Stephanie|Daniel/i.test(v.name))||vs.find(v=>/en-GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;return VOICE;}
+function speakable(t){return String(t).replace(/<[^>]+>/g,'').replace(/\+/g,' plus ').replace(/=/g,' equals ').replace(/−/g,' minus ').replace(/T\. rex/g,'T rex').replace(/[🎉🦕🦖🥚🪺]/gu,'');}
+let sayId=0;
+function say(t,done){
+  const id=++sayId;let fired=false;const fin=()=>{if(!fired&&id===sayId){fired=true;done&&done();}};
+  if(!S.voice||!window.speechSynthesis||!t){if(done)done();return;}
+  try{
+    speechSynthesis.cancel();
+    setTimeout(()=>{if(id!==sayId)return;const u=new SpeechSynthesisUtterance(speakable(t));u.lang='en-GB';u.rate=0.92;const v=getVoice();if(v)u.voice=v;u.onend=fin;u.onerror=fin;speechSynthesis.speak(u);},60);
+    if(done)setTimeout(fin,6000);   // in case the iPad never says "finished"
+  }catch(e){if(done)done();}
+}
+function hush(){sayId++;try{window.speechSynthesis&&speechSynthesis.cancel();}catch(e){}}
+
+// ---------- little drawing helpers ----------
+const app=document.getElementById('app');
+const FROM_DX=/[?&]from=dx\b/.test(location.search);   // opened from Dino Explorer: show a way back
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+function btn(cls,html,fn){const b=el('button',cls,html);b.addEventListener('click',fn);return b;}
+// ten-frame: a green dots then b orange dots; mark = pulse the empty spaces; x = pulse the last dot
+function frame(a,b=0,o={}){
+  const f=el('div','tf'+(o.sm?' sm':''));
+  for(let k=0;k<10;k++){
+    const c=el('div','c');
+    if(k<a+b){const d=el('div','dot '+(k<a?'a':'b'));if(o.x&&k===a+b-1)d.classList.add('x');c.appendChild(d);}
+    else if(o.mark)c.classList.add('e');
+    f.appendChild(c);
+  }
+  return f;
+}
+// up to 20: green a then orange b over two frames
+function frames(a,b,o={}){
+  const r=el('div','row');const t=a+b;
+  const a1=Math.min(a,10),b1=Math.min(b,10-a1);
+  r.appendChild(frame(a1,b1,o));
+  if(t>10)r.appendChild(frame(a-a1,b-b1,o));
+  return r;
+}
+function partWhole(W,a,b,hide,sm){
+  const pw=el('div','pw'+(sm?' sm':''));
+  pw.innerHTML='<svg viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="50" y1="30" x2="25" y2="72" stroke="#43a047" stroke-width="2.5"/><line x1="50" y1="30" x2="75" y2="72" stroke="#43a047" stroke-width="2.5"/></svg>';
+  const c=(v,q,cl)=>el('div','circ'+(q?' q':'')+(cl?' '+cl:''),q?'?':String(v));
+  pw.appendChild(c(W,hide==='w','w'));pw.appendChild(c(a,hide==='a'));pw.appendChild(c(b,hide==='p'));
+  return pw;
+}
+function rods(t,o){
+  const r=el('div','rods');
+  for(let k=0;k<t;k++){const rod=el('div','rod');for(let j=0;j<10;j++)rod.appendChild(el('i'));r.appendChild(rod);}
+  if(o){const c=el('div','cubes');for(let j=0;j<o;j++)c.appendChild(el('i'));r.appendChild(c);}
+  return r;
+}
+function stars(n){return '★'.repeat(n)+'☆'.repeat(3-n);}
+
+// ---------- tricky facts (missed ones come back more often) ----------
+// a missed fact stays "tricky" until she gets it right first time on 2 later days (not the same day she missed it)
+function recMiss(lvl,key,p){const T=S.tricky[lvl]=S.tricky[lvl]||{};const r=T[key]=T[key]||{m:0,p};r.m++;r.need=2;r.last=today_();save();}
+function recRight(lvl,key){const r=(S.tricky[lvl]||{})[key];if(r&&r.need>0&&r.last!==today_()&&r.lastOk!==today_()){r.need--;r.lastOk=today_();save();}}
+function trickyList(lvl){return Object.values(S.tricky[lvl]||{}).filter(r=>r.need>0).map(r=>r.p);}
+function trickyPick(lvl){const l=trickyList(lvl);return l.length&&Math.random()<0.35?pick(l):null;}
+
+// ---------- the plan: which step is next ----------
+function threes(id){const t=S.three[id];return Array.isArray(t)?t:[];}
+function mastered(id){return threes(id).length>=2;}   // 3 stars, mostly quick, on 2 different days
+function addThree(id){const t=threes(id),d=today_();if(!t.includes(d))t.push(d);S.three[id]=t.slice(-5);}
+function unlocked(i){return S.openAll||i===0||i>=5||(S.stars[LV[i-1].id]||0)>=2;}
+let CUR=null;
+function currentLevel(){
+  if(S.focus&&S.focus!=='auto'&&LVI[S.focus]!=null)return S.focus;
+  for(let i=0;i<LV.length;i++)if(unlocked(i)&&!mastered(LV[i].id))return LV[i].id;
+  return CUR||pick(LV.filter(l=>l.id!=='snap')).id;
+}
+
+// ---------- screens ----------
+let G=null;
+function home(){
+  G=null;hush();app.innerHTML='';
+  if(S.name===null)return askName();
+  const top=el('div','top');
+  if(FROM_DX)top.appendChild(btn('ibtn','🦖',()=>{hush();location.href='index.html';}));
+  top.appendChild(btn('ibtn','🪺',nestScreen));
+  top.appendChild(el('h1','',`${S.name?esc(S.name)+'’s ':''}Dino Maths`));
+  top.appendChild(btn('ibtn','⚙️',gate));
+  app.appendChild(top);
+  const cur=CUR=currentLevel(),L=LV[LVI[cur]];
+  const t=btn('today',`<b>🌋 Today’s Dino Adventure</b><span>About 10 minutes · ${L.icon} ${L.title}</span>`,today);
+  app.appendChild(t);
+  const map=el('div','map');
+  LV.forEach((L,i)=>{
+    const open=unlocked(i),s=S.stars[L.id]||0;
+    const b=el('button','step'+(open?'':' lock')+(L.id===cur?' next':''));
+    b.innerHTML=`<span class="n">${i+1}</span><span class="ic">${open?L.icon:'🔒'}</span><span><span class="t">${L.title}${L.id===cur?'<span class="tag">Next</span>':''}${L.cls&&L.id!==cur?'<span class="tag cls">Class</span>':''}</span><br><span class="s">${L.sub}</span><br><span class="st">${stars(s)}${mastered(L.id)?' 🏅':''}</span></span>`;
+    b.addEventListener('click',()=>{if(!open){sfx('bad');say('Get 2 stars on the step before to open this one!');b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),400);return;}play(L.id);});
+    map.appendChild(b);
+  });
+  app.appendChild(map);
+  app.appendChild(el('div','foot',S.nest.length?`🪺 ${S.nest.length} baby dino${S.nest.length>1?'s':''} hatched so far`:'Fill all the eggs in a game to hatch a baby dinosaur! 🥚'));
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function askName(){
+  const o=el('div','ovl'),b=el('div','box');
+  b.appendChild(el('div','prompt','🦕 Hello! What’s your name?'));
+  const inp=el('input');inp.maxLength=16;inp.autocomplete='off';b.appendChild(inp);
+  const go=()=>{S.name=inp.value.trim();save();o.remove();home();};
+  b.appendChild(btn('pbtn','Let’s go!',go));
+  b.appendChild(btn('pbtn alt','Skip',()=>{inp.value='';go();}));
+  o.appendChild(b);app.appendChild(o);
+}
+function play(id){if(id==='snap')return startSnap();startRound(Array(8).fill(id),()=>play(id));}
+function today(){
+  const cur=CUR||currentLevel();
+  if(cur==='snap')return startSnap(today);
+  const earlier=LV.slice(0,LVI[cur]).map(l=>l.id).filter(id=>id!=='snap');
+  const warm=[];
+  const tr=earlier.filter(id=>trickyList(id).length);
+  for(let k=0;k<4&&earlier.length;k++)warm.push(k<2&&tr.length?pick(tr):pick(earlier));   // 2 from steps with tricky facts, 2 from any earlier step
+  startRound([...warm,...Array(8).fill(cur)],today);
+}
+function playFrame(title){
+  hush();app.innerHTML='';
+  const top=el('div','top');
+  top.appendChild(btn('ibtn','🏠',home));
+  top.appendChild(el('h1','',title));
+  top.appendChild(btn('ibtn','🔊',()=>{G&&say(G.sayNow);}));
+  app.appendChild(top);
+  const eggs=el('div','eggs');eggs.id='eggs';
+  for(let k=0;k<G.total;k++)eggs.appendChild(el('span','egg','🥚'));
+  app.appendChild(eggs);
+  const st=el('div','stage');st.id='stage';app.appendChild(st);
+  app.appendChild(el('div','praise'));
+}
+function eggsUpdate(){const e=document.querySelectorAll('#eggs .egg');e.forEach((x,k)=>x.classList.toggle('on',k<G.done));}
+const PRAISE=['Roar-some!','Dino-mite!','Brilliant!','Stomping good!','Super!','Egg-cellent!','Clever dino!','Yes!'];
+function praise(t){const p=document.querySelector('.praise');if(p)p.textContent=t||'';}
+
+function startRound(seq,again){
+  G={rid:Math.random(),seq,total:seq.length,done:0,qn:0,queue:[],stat:{},again,last:null,seen:{}};
+  const lvls=[...new Set(seq)];
+  playFrame(lvls.length>1?'Today’s Adventure':LV[LVI[seq[0]]].title);
+  nextQ();
+}
+function nextQ(){
+  if(!G)return;
+  if(G.done>=G.total)return endRound();
+  const lvl=G.seq[G.done],i=G.seq.slice(0,G.done).filter(x=>x===lvl).length;
+  let p=null,qi=G.queue.findIndex(r=>r.lvl===lvl&&r.due<=G.qn);
+  G.requeued=qi>=0;
+  if(qi>=0)p=G.queue.splice(qi,1)[0].p;else p=trickyPick(lvl);
+  const o={adv:(S.stars[lvl]||0)>=2};
+  let q=GEN[lvl](p,i,o);
+  if(qi<0&&p&&(G.seen[q.key]||0)>=2){p=null;q=GEN[lvl](null,i,o);}   // a tricky fact at most 3 times a round
+  for(let k=0;k<6&&!p&&(q.key===G.last||(G.seen[q.key]||0)>=2);k++)q=GEN[lvl](null,i,o);
+  G.seen[q.key]=(G.seen[q.key]||0)+1;
+  G.q=q;G.last=q.key;G.step=0;G.missed=false;G.help=false;G.covered=false;G.peeked=false;G.t0=0;G.tap=0;G.qn++;
+  renderQ();
+}
+function renderQ(){
+  const q=G.q,st=q.steps[G.step],stage=document.getElementById('stage');
+  stage.innerHTML='';praise('');
+  const vis=VIEW[q.lvl](q,G.step,false);if(vis)stage.appendChild(vis);
+  stage.appendChild(el('div','prompt',st.text));
+  if(st.sub)stage.appendChild(el('div','sub',st.sub));
+  const help=el('div','help');help.id='help';help.style.display='none';stage.appendChild(help);   // help sits above the answers
+  const opts=el('div','opts'+(st.opts.length===2?' two':''));
+  st.opts.forEach(v=>{const b=el('button','opt',String(v));b.addEventListener('click',()=>answer(b,v));opts.appendChild(b);});
+  G.sayNow=st.say;
+  if(q.lvl==='flash'&&!G.covered){
+    const pk=btn('pbtn alt','👀 Peek once',()=>peek(stage));pk.id='peek';pk.style.visibility='hidden';stage.appendChild(pk);   // space kept so nothing jumps
+    stage.appendChild(opts);opts.style.visibility='hidden';
+    const rid=G.rid,qn=G.qn;say(st.say,()=>{if(G&&G.rid===rid&&G.qn===qn)flashCover(stage,opts);});   // the flash starts after the question is read
+  } else {stage.appendChild(opts);say(st.say);if(!G.t0)G.t0=Date.now();}
+}
+// Ten-Frame Flash: the frame shows for a moment, then grass covers it
+function flashCover(stage,opts){
+  const qn=G.qn,rid=G.rid;
+  setTimeout(()=>{
+    if(!G||G.rid!==rid||G.qn!==qn||G.help||G.covered)return;
+    const f=stage.querySelector('.tf');if(!f)return;
+    G.covered=true;f.appendChild(el('div','cover','🌿'));opts.style.visibility='visible';G.t0=Date.now();
+    const pk=document.getElementById('peek');if(pk)pk.style.visibility='visible';
+  },S.flash);
+}
+function peek(stage){   // one peek per question; a peeked answer doesn't count as quick
+  const f=stage.querySelector('.tf'),c=f&&f.querySelector('.cover'),pk=document.getElementById('peek');
+  if(!c||G.peeked)return;
+  G.peeked=true;c.remove();if(pk)pk.style.visibility='hidden';
+  const qn=G.qn,rid=G.rid;
+  setTimeout(()=>{if(G&&G.rid===rid&&G.qn===qn&&!G.help&&!f.querySelector('.cover'))f.appendChild(el('div','cover','🌿'));},S.flash);
+}
+function answer(b,v){
+  if(!G||b.disabled)return;
+  const q=G.q,st=q.steps[G.step];
+  if(!G.tap)G.tap=Date.now();
+  if(v===st.ans){
+    document.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+    b.classList.add('right');sfx('good');
+    if(G.step+1<q.steps.length){
+      const extra=AFTER[q.lvl]&&AFTER[q.lvl](q,G.step);
+      praise(extra||pick(PRAISE));if(extra)say(extra);else hush();
+      G.step++;G.help=false;
+      setTimeout(()=>{if(G&&G.q===q)renderQ();},extra?2200:900);
+    } else finishQ(b);
+  } else {
+    b.classList.add('wrong','shake');b.disabled=true;sfx('bad');
+    if(!G.missed&&st.kind!=='bigger'){G.missed=true;recMiss(q.lvl,q.key,q.p);if(!G.queue.some(r=>r.p===q.p))G.queue.push({lvl:q.lvl,p:q.p,due:G.qn+2});}   // the "which is bigger" choice is practice, not a miss
+    showHelp();
+  }
+}
+function showHelp(){
+  const q=G.q,h=document.getElementById('help');G.help=true;
+  const c=document.querySelector('.cover');if(c)c.remove();
+  const pk=document.getElementById('peek');if(pk)pk.remove();
+  h.innerHTML='';h.style.display='flex';
+  const [txt,vis]=HELP[q.lvl](q,G.step);
+  h.appendChild(el('div','',txt));if(vis)h.appendChild(vis);
+  say(txt);
+  const o=document.querySelector('.opts');if(o&&o.scrollIntoView)o.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function finishQ(b){
+  const q=G.q;G.done++;
+  const s=G.stat[q.lvl]=G.stat[q.lvl]||{n:0,first:0,fn:0,quick:0};s.n++;
+  if(!G.missed){s.first++;if(!G.requeued)recRight(q.lvl,q.key);}
+  if(q.steps.length===1){s.fn++;if(!G.missed&&!G.peeked&&G.t0&&G.tap-G.t0<=QUICK)s.quick++;}   // quick = answered without counting time
+  eggsUpdate();
+  const fin=DONE[q.lvl]&&DONE[q.lvl](q);
+  if(fin){const stage=document.getElementById('stage');const v=el('div','big',fin);stage.insertBefore(v,stage.firstChild.nextSibling||null);}
+  praise(pick(PRAISE));say(pick(['Well done!','Great!','Yes!','Brilliant!']));
+  setTimeout(()=>{if(G&&G.q===q)nextQ();},fin?1600:1000);
+}
+const QUICK=6000;   // ms: a fact answered within ~6 s (while the question is read too) counts as known, not counted
+function starsFor(first,n){const r=first/n;return r>=0.875?3:r>=0.75?2:1;}
+function endRound(){
+  const results=[];
+  for(const [lvl,s] of Object.entries(G.stat)){
+    if(s.n<6)continue;
+    const st=starsFor(s.first,s.n);results.push(st);
+    S.stars[lvl]=Math.max(S.stars[lvl]||0,st);
+    const quickOk=!s.fn||s.quick/s.fn>=0.75;
+    if(st===3&&quickOk)addThree(lvl);
+    S.plays[lvl]=(S.plays[lvl]||0)+1;
+    S.log.push({d:today_(),lvl,first:s.first,n:s.n,fn:s.fn,quick:s.quick});
+  }
+  S.log=S.log.slice(-80);save();
+  hatchScreen(results.length?Math.max(...results):0,G.total,G.again);
+}
+
+// what each step looks like
+const VIEW={
+  flash(q){const w=el('div','row');w.appendChild(frame(q.n));return w;},
+  bonds(q){return partWhole(q.W,q.a,q.b,q.hide);},
+  doubles(q){
+    const r=el('div','row');
+    const one=(n,col)=>{const c=el('div');c.appendChild(n<=10?frame(col==='a'?n:0,col==='b'?n:0,{sm:true}):frames(n,0,{sm:true}));return c;};
+    r.appendChild(one(q.a,'a'));r.appendChild(el('span','plus','+'));r.appendChild(one(q.b,'b'));return r;
+  },
+  make10(q,step){
+    const st=q.steps[step],w=el('div','');w.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px';
+    if(st.kind==='plain'||st.kind==='three')return null;
+    if(st.kind==='bigger'){
+      const r=el('div','row');
+      [q.x,q.y].forEach((n,k)=>{const c=el('div','');c.style.textAlign='center';c.appendChild(el('div','big',String(n)));c.appendChild(frame(k?0:n,k?n:0,{sm:true}));r.appendChild(c);if(!k)r.appendChild(el('span','plus','+'));});
+      w.appendChild(r);return w;
+    }
+    w.appendChild(el('div','big',`${q.big} + ${q.small}`));
+    if(q.pic||G.help){
+      const r=el('div','row');
+      const nest=el('div','');nest.appendChild(el('div','lbl','🪺 The nest'));
+      const basket=el('div','');basket.appendChild(el('div','lbl','🧺 Still to go'));
+      if(st.kind==='fill'){nest.appendChild(frame(q.big,0,{mark:G.help}));basket.appendChild(frame(0,q.small,{sm:true}));}
+      else {nest.appendChild(frame(q.big,q.need));basket.appendChild(frame(0,q.rest,{sm:true}));}
+      r.appendChild(nest);r.appendChild(basket);w.appendChild(r);
+    }
+    if(st.kind==='split'||st.kind==='ten')w.appendChild(partWhole(q.small,q.need,q.rest,st.kind==='split'?'p':null,true));
+    return w;
+  },
+  tens(q){
+    if(q.f==='A')return rods(q.t,q.o);
+    return null;
+  },
+  tenmore(q){return hundred(q,false);},
+  column(q,step){return colView(q,q.plain?-1:step,false);}
+};
+function hundred(q,help){
+  const g=el('div','hund'),n=q.n,ans=n+q.d;
+  const rs=Math.floor((n-1)/10),re=Math.floor((ans-1)/10),lo=Math.min(rs,re),hi=Math.max(rs,re),col=(n-1)%10;
+  for(let r=lo;r<=hi;r++)for(let c=0;c<10;c++){
+    const v=r*10+c+1,d=el('div');
+    if(v===n){d.className='me';d.textContent=v;}
+    else if(v===ans){d.className='tq';d.textContent='?';}
+    else if(r===rs){d.textContent=v;}
+    else if(help){d.textContent=v;if(c===col)d.className='path';}
+    else d.className='gap';
+    g.appendChild(d);
+  }
+  const w=el('div','');w.style.cssText='display:flex;flex-direction:column;align-items:center;gap:8px;width:100%';
+  w.appendChild(el('div','lbl',q.d>0?`⬇️ ${q.d} more = ${q.d/10} row${q.d>10?'s':''} down`:`⬆️ ${-q.d} less = ${-q.d/10} row${q.d<-10?'s':''} up`));
+  w.appendChild(g);return w;
+}
+function colView(q,step,done){
+  const g=el('div','colw');
+  const cell=(t,c)=>{const d=el('div',c||'',t==null?'':String(t));g.appendChild(d);};
+  const hlT=!done&&step===1?' hl':'',hlO=!done&&step===0?' hl':'';
+  cell('');cell('T','h');cell('O','h');
+  cell('');cell(step>=1&&q.c?'1':'','carry');cell('');
+  cell('');cell(q.aT||'',hlT);cell(q.aO,hlO);
+  cell('+');cell(q.bT||'',hlT);cell(q.bO,hlO);
+  g.appendChild(el('div','line'));
+  cell('');cell(done?q.ts:'','ans'+hlT);cell(step>=1||done?q.os%10:'','ans'+hlO);
+  return g;
+}
+// extra words between steps
+const AFTER={
+  make10(q,step){const k=q.steps[step].kind;if(k==='fill')return `${q.big} + ${q.need} = 10. The nest is full!`;if(k==='split')return `${q.small} is ${q.need} and ${q.rest}.`;return null;},
+  column(q,step){return step===0&&q.c?`${q.os} = 1 ten and ${q.os-10} ones. Write ${q.os-10} in the ones and carry the 1 to the tens!`:null;}
+};
+// the finished sum, shown big
+const DONE={
+  make10(q){return q.three?`${q.order.join(' + ')} = ${q.ans} 🎉`:`${q.x} + ${q.y} = ${q.ans} 🎉`;},
+  column(q){const s=document.getElementById('stage');const old=s.querySelector('.colw');if(old)old.replaceWith(colView(q,1,true));return `${q.a} + ${q.b} = ${q.ans}`;}
+};
+// what to show after a wrong answer: a picture, never a telling-off
+const HELP={
+  flash(q){const r=el('div','row');r.appendChild(frame(q.n,0,{mark:true}));return [`Look at the empty spaces. ${q.n} and how many more fill the frame?`,r];},
+  bonds(q){const t=q.hide==='w'?`${q.a} green and ${q.b} orange. Put them all together!`:q.hide==='a'?`There are ${q.W} altogether. ${q.b} are orange. How many are green?`:`There are ${q.W} altogether. ${q.a} are green. How many are orange?`;return [t,frames(q.a,q.b,{sm:true})];},
+  doubles(q){
+    if(!q.near){const r=el('div','row');r.appendChild(q.a<=10?frame(q.a,0,{sm:true}):frames(q.a,0,{sm:true}));r.appendChild(el('span','plus','+'));r.appendChild(frame(0,q.a,{sm:true}));return [`Double ${q.a}: two lots of ${q.a}.`,r];}
+    const r=el('div','row');r.appendChild(frame(q.lo,0,{sm:true}));r.appendChild(el('span','plus','+'));r.appendChild(frame(0,q.lo+1,{sm:true,x:true}));
+    return [`Double ${q.lo} is ${2*q.lo}. The other one has one more, so add 1!`,r];
+  },
+  make10(q,step){
+    const k=q.steps[step].kind;
+    if(k==='three'){const r=el('div','row');r.appendChild(frame(q.a,10-q.a,{sm:true}));r.appendChild(el('span','plus','+'));r.appendChild(frame(0,q.c,{sm:true}));return [`${q.a} + ${10-q.a} = 10. Then add the ${q.c}.`,r];}
+    if(k==='plain'){const r=el('div','row');r.appendChild(frame(q.big,q.need,{sm:true}));r.appendChild(frame(0,q.rest,{sm:true}));return [`Make 10 first! ${q.big} + ${q.need} = 10, and ${q.rest} more.`,r];}
+    if(k==='bigger')return [`Start with the bigger number. ${Math.max(q.x,q.y)} is bigger than ${Math.min(q.x,q.y)}.`,null];
+    if(k==='fill'){const r=el('div','row');r.appendChild(frame(q.big,0,{mark:true}));return [`The nest has ${q.big}. Look at the empty spaces.`,r];}
+    if(k==='split'){const r=el('div','row');r.appendChild(frame(0,q.need,{sm:true}));r.appendChild(el('span','plus','+'));r.appendChild(frame(0,q.rest,{sm:true,x:false}));return [`${q.need} went into the nest. How many of the ${q.small} are left?`,r];}
+    const r=el('div','row');r.appendChild(frame(10));r.appendChild(frame(0,q.rest,{sm:true}));return [`A full ten and ${q.rest} more.`,r];
+  },
+  tens(q){return [`${q.t} ten${q.t>1?'s':''} and ${q.o} one${q.o===1?'':'s'}.`,rods(q.t,q.o)];},
+  tenmore(q){return [q.d>0?`Ten more is the number right underneath. Only the tens change!`:`Ten less is the number right above. Only the tens change!`,hundred(q,true)];},
+  column(q,step){
+    if(q.plain)return [`Ones first: ${q.aO} + ${q.bO} = ${q.os}.`+(q.c?` That's 1 ten and ${q.os-10} ones, so carry the 1.`:'')+` Then add the tens.`,rods(q.aT,q.aO)];
+    if(step===0){
+      if(q.os>=10){const r=el('div','row');r.appendChild(frame(q.aO,10-q.aO,{sm:true}));r.appendChild(frame(0,q.os-10,{sm:true}));return [`Make 10! ${q.aO} + ${10-q.aO} = 10, and ${q.os-10} more.`,r];}
+      return [`${q.aO} and ${q.bO} more.`,frames(q.aO,q.bO,{sm:true})];
+    }
+    if(!q.aT&&!q.bT)return [`There were no tens to start with. Only the 1 ten you carried!`,rods(1,0)];
+    return [`Add the tens: ${q.aT} + ${q.bT}`+(q.c?' + the little 1 you carried.':'.'),rods(q.aT+q.bT+q.c,0)];
+  }
+};
+
+// ---------- Snap to 10 ----------
+function startSnap(again){
+  G={rid:Math.random(),snap:true,total:8,done:0,wrong:0,sel:null,again:again||(()=>startSnap())};
+  playFrame('Snap to 10');newBoard();
+}
+function newBoard(){
+  const stage=document.getElementById('stage');stage.innerHTML='';
+  stage.appendChild(el('div','prompt','Tap two cards that make 10!'));
+  G.sayNow='Tap two cards that make ten!';say(G.sayNow);
+  const grid=el('div','cards');
+  G.cards=snapBoard(trickyList('snap').map(p=>p.a));
+  G.cards.forEach(c=>{
+    const b=el('button','card');
+    if(c.dots){b.appendChild(frame(c.v,0));}else b.textContent=c.v;
+    c.el=b;b.addEventListener('click',()=>snapTap(c));grid.appendChild(b);
+  });
+  stage.appendChild(grid);
+  const h=el('div','help');h.id='help';h.style.display='none';stage.appendChild(h);
+}
+function snapTap(c){
+  if(c.gone||G.busy)return;
+  sfx('pop');
+  if(!G.sel){G.sel=c;c.el.classList.add('sel');return;}
+  if(G.sel===c){c.el.classList.remove('sel');G.sel=null;return;}
+  const a=G.sel;G.sel=null;
+  if(a.v+c.v===10){
+    a.gone=c.gone=true;a.el.classList.add('gone');c.el.classList.add('gone');a.el.classList.remove('sel');
+    G.done++;eggsUpdate();sfx('good');praise(`${a.v} + ${c.v} = 10! ${pick(PRAISE)}`);recRight('snap','s'+Math.min(a.v,c.v));
+    document.getElementById('help').style.display='none';
+    if(G.cards.every(x=>x.gone)){G.busy=true;setTimeout(()=>{G.busy=false;if(G.done>=G.total)snapEnd();else newBoard();},1100);}
+  } else {
+    G.wrong++;sfx('bad');a.el.classList.remove('sel');
+    [a,c].forEach(x=>{x.el.classList.add('shake');setTimeout(()=>x.el.classList.remove('shake'),450);});
+    const m=Math.min(a.v,10-a.v);recMiss('snap','s'+m,{a:m});
+    const h=document.getElementById('help');h.innerHTML='';h.style.display='flex';
+    const t=`${a.v} + ${c.v} = ${a.v+c.v}, not 10. ${a.v} needs ${10-a.v} to make 10.`;
+    h.appendChild(el('div','',t));h.appendChild(frame(a.v,0,{sm:true,mark:true}));
+    say(t);
+  }
+}
+function snapEnd(){
+  const st=G.wrong<=1?3:G.wrong<=3?2:1;
+  S.stars.snap=Math.max(S.stars.snap||0,st);if(st===3)addThree('snap');
+  S.plays.snap=(S.plays.snap||0)+1;S.log.push({d:today_(),lvl:'snap',first:8-Math.min(8,G.wrong),n:8});S.log=S.log.slice(-80);save();
+  hatchScreen(st,8,G.again);
+}
+
+// ---------- hatching ----------
+const NAMES=['Pebble','Bubbles','Sprout','Twiggy','Coco','Mango','Biscuit','Ziggy','Poppy','Rumble','Noodle','Sunny','Pip','Maple','Fizz','Bramble','Dotty','Waffle','Tumble','Jelly','Nibbles','Clover','Toffee','Scout','Pudding','Button','Comet','Hazel','Juniper','Marshmallow'];
+// colours checked by eye on Apple's emoji (the two dinosaurs start from different colours)
+const KINDS=[
+ {e:'🦕',s:['Brachiosaurus','Diplodocus','Apatosaurus'],cols:[['blue',30,1.6],['purple',75,1.6],['pink',120,1.6],['red',150,1.6],['orange',180,1.6],['golden',210,1.8],['green',270,1.6],['teal',330,1.6]]},
+ {e:'🦖',s:['T. rex'],cols:[['green',0,1.2],['teal',90,1.4],['blue',120,1.4],['purple',180,1.4],['pink',240,1.4],['red',270,1.4],['orange',300,1.4],['golden',330,1.5]]}
+];
+function hatchScreen(st,n,again){
+  G=null;hush();app.innerHTML='';
+  const w=el('div','stage');
+  w.appendChild(el('div','prompt',`You filled ${n} eggs!`));
+  if(st)w.appendChild(el('div','stars',stars(st)));
+  w.appendChild(el('div','sub','Tap the egg to help it hatch!'));
+  const egg=el('button','bigegg','🥚');let taps=0;
+  say(`You filled ${n} eggs! Tap the egg to help it hatch!`);
+  egg.addEventListener('click',()=>{
+    taps++;egg.classList.remove('wob');void egg.offsetWidth;egg.classList.add('wob');sfx('crack');
+    if(taps===2)egg.textContent='🐣';
+    if(taps>=3){
+      const used=new Set(S.nest.map(d=>d.name));
+      const name=pick(NAMES.filter(x=>!used.has(x)).length?NAMES.filter(x=>!used.has(x)):NAMES);
+      const k=pick(KINDS),[cn,hue,sat]=pick(k.cols),d={e:k.e,s:pick(k.s),name,col:cn,f:`hue-rotate(${hue}deg) saturate(${sat})`,date:new Date().toISOString().slice(0,10)};
+      S.nest.push(d);save();sfx('hatch');
+      const dn=el('div','dino',k.e);dn.style.filter=d.f;egg.replaceWith(dn);
+      const t=`Meet ${d.name}, the ${d.col} ${d.s}!`;
+      w.querySelector('.sub').textContent=t;say(t);
+      const b=el('div','btns');
+      b.appendChild(btn('pbtn','▶️ Play again',again));
+      b.appendChild(btn('pbtn alt','🗺️ Map',home));
+      b.appendChild(btn('pbtn alt','🪺 My nest',nestScreen));
+      w.appendChild(b);
+    }
+  });
+  w.appendChild(egg);app.appendChild(w);
+}
+function nestScreen(){
+  G=null;hush();app.innerHTML='';
+  const top=el('div','top');top.appendChild(btn('ibtn','🏠',home));top.appendChild(el('h1','',`My Dino Nest (${S.nest.length})`));top.appendChild(el('span','ibtn',''));top.lastChild.style.visibility='hidden';
+  app.appendChild(top);
+  if(!S.nest.length){app.appendChild(el('div','stage','<div class="prompt">No baby dinos yet!</div><div class="sub">Fill all the eggs in any game to hatch one.</div>'));return;}
+  const g=el('div','nest');
+  S.nest.slice().reverse().forEach(d=>{const c=el('div','');const s=el('span','',d.e);s.style.filter=d.f;c.appendChild(s);c.appendChild(el('b','',esc(d.name)));c.appendChild(el('div','',`${d.col} ${d.s}`));g.appendChild(c);});
+  app.appendChild(g);
+}
+
+// ---------- grown-ups ----------
+function gate(){
+  hush();
+  const o=el('div','ovl'),b=el('div','box');
+  b.appendChild(el('div','prompt','Grown-ups only'));
+  b.appendChild(el('div','sub','Press and hold the button for 3 seconds.'));
+  const h=el('button','hold','Hold me <i></i>');let tm=null,t0=0,raf=0;
+  const bar=h.querySelector('i');
+  const stop=()=>{clearTimeout(tm);cancelAnimationFrame(raf);bar.style.width='0';};
+  const tick=()=>{bar.style.width=Math.min(100,(Date.now()-t0)/30)+'%';raf=requestAnimationFrame(tick);};
+  h.addEventListener('pointerdown',e=>{e.preventDefault();t0=Date.now();tick();tm=setTimeout(()=>{stop();o.remove();grownups();},3000);});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>h.addEventListener(ev,stop));
+  h.addEventListener('contextmenu',e=>e.preventDefault());
+  b.appendChild(h);b.appendChild(btn('pbtn alt','Back',()=>o.remove()));
+  o.appendChild(b);app.appendChild(o);
+}
+function factText(lvl,p){
+  switch(lvl){
+    case 'flash':return `${p.n} + ? = 10`;
+    case 'snap':return `${p.a} + ${10-p.a} = 10`;
+    case 'bonds':return `${p.a} + ${p.W-p.a} = ${p.W}`;
+    case 'doubles':return `${p.a} + ${p.b}`;
+    case 'make10':return `${p.x} + ${p.y}`;
+    case 'tens':return `${10*p.t+p.o} = ${10*p.t} + ${p.o}`;
+    case 'tenmore':return `${p.n} ${p.d>0?'+':'−'} ${Math.abs(p.d)}`;
+    case 'column':return `${p.a} + ${p.b}`;
+  }
+  return '';
+}
+function grownups(){
+  G=null;hush();app.innerHTML='';
+  const top=el('div','top');top.appendChild(btn('ibtn','🏠',home));top.appendChild(el('h1','','Grown-ups'));top.appendChild(el('span','ibtn',''));top.lastChild.style.visibility='hidden';
+  app.appendChild(top);
+  const plan=el('div','gu');
+  plan.innerHTML=`<h2>The plan</h2>
+  <p><b>10 minutes a day:</b> tap <b>Today’s Dino Adventure</b>. It runs 4 warm-up questions from earlier steps (mostly ones she found tricky) and then 8 on her current step. Snap to 10 is a good extra if she wants more.</p>
+  <p><b>Order:</b> steps 1–5 build the facts that replace finger-counting, so each opens when the one before has 2 stars (6 of 8 right first time). Steps 6–8 are what her class is doing now (place value, ten more/less, column addition), so they are always open for homework practice. Today’s Adventure keeps her on steps 1–5 until each has a 🏅; use <b>Today focuses on</b> below to point it at a class step for a while.</p>
+  <p><b>🏅 means she knows it, not just gets it right:</b> 3 stars on two different days, with at least 6 of 8 answers <b>quick</b> (within about 6 seconds, which is too fast to count on fingers). She never sees a clock; the quick count is only shown here. If she gets stars but few quick answers, she is still counting: stay on that step and do its "at home" idea.</p>
+  <p><b>Pace:</b> steps 1–5 usually take a few weeks in all; go at her pace. If a step drags, spend a few days on its "at home" idea with real objects. That is the Singapore order: objects → pictures → numbers.</p>
+  <p><b>No timers, no penalties:</b> a wrong answer brings up a picture of the idea, and the question comes back a little later. A missed fact stays on her "tricky" list until she gets it right first time on two later days. Tricky facts come back more often, including in the warm-up.</p>
+  <p><b>On the iPad:</b> open it in Safari, then Share → <b>Add to Home Screen</b>. Played from the Home Screen, her progress is kept safely (Safari may clear a website’s saved data if it isn’t used for a week or so). Use <b>Back up progress</b> below now and then.</p>
+  <p><small>Worksheets are in <code>${SHEETS}</code></small></p>`;
+  const ol=el('ol');
+  LV.forEach(L=>{const li=el('li');li.innerHTML=`<b>${L.icon} ${L.title}</b> — ${L.teach}<br><i>Ready to move on:</i> ${L.ready}<br><i>At home:</i> ${L.home}<br><i>Print:</i> ${L.sheets.map(s=>`<code>${s}</code>`).join(', ')}`;ol.appendChild(li);});
+  plan.appendChild(ol);app.appendChild(plan);
+
+  const prog=el('div','gu');let ph='<h2>How she’s doing</h2>';
+  const wk=new Set(S.log.filter(r=>(Date.now()-new Date(r.d+'T12:00'))/864e5<7).map(r=>r.d)).size;
+  ph+=`<p>Played on <b>${wk}</b> of the last 7 days.</p><ol>`;
+  LV.forEach(L=>{const tr=Object.values(S.tricky[L.id]||{}).filter(r=>r.need>0).sort((a,b)=>b.m-a.m).slice(0,8);
+    ph+=`<li><b>${L.title}</b>: ${stars(S.stars[L.id]||0)}${mastered(L.id)?' 🏅':''} · played ${S.plays[L.id]||0}×${tr.length?`<br><small>Still tricky: ${tr.map(r=>factText(L.id,r.p)).join(' · ')}</small>`:''}</li>`;});
+  ph+='</ol>';
+  const recent=S.log.slice(-8).reverse();
+  if(recent.length)ph+='<h3>Last rounds</h3>'+recent.map(r=>`${r.d} · ${LV[LVI[r.lvl]].title}: ${r.first}/${r.n} right first time`+(r.fn?`, ${r.quick}/${r.fn} quick`:'')).join('<br>');
+  prog.innerHTML=ph;app.appendChild(prog);
+
+  const set=el('div','gu');set.innerHTML='<h2>Settings</h2>';
+  const sw=(label,get,opts)=>{const r=el('div','sw');r.appendChild(el('span','',label));const g=el('span','');opts.forEach(([t,v])=>{const b=btn(get()===v?'on':'',t,()=>{opts.set(v);save();grownups();});g.appendChild(b);});r.appendChild(g);set.appendChild(r);};
+  const mk=(label,key,opts)=>{opts.set=v=>S[key]=v;sw(label,()=>S[key],opts);};
+  mk('Read questions aloud','voice',[['On',true],['Off',false]]);
+  mk('Sounds','sound',[['On',true],['Off',false]]);
+  mk('Ten-Frame Flash shows the dots for','flash',[['1 s',1000],['1.5 s',1500],['2.5 s',2500]]);
+  mk('Open every step','openAll',[['Yes',true],['No',false]]);
+  const fr=el('div','sw');fr.appendChild(el('span','','Today’s Adventure focuses on'));const sel=el('select');sel.style.cssText='font-size:17px;padding:6px;border-radius:10px';
+  [['auto','Next step (automatic)'],...LV.map((l,i)=>[l.id,`${i+1}. ${l.title}`])].forEach(([v,t])=>{const op=el('option','',t);op.value=v;if((S.focus||'auto')===v)op.selected=true;sel.appendChild(op);});
+  sel.addEventListener('change',()=>{S.focus=sel.value;CUR=null;save();});fr.appendChild(sel);set.appendChild(fr);
+  const nr=el('div','sw');nr.appendChild(el('span','','Child’s name'));
+  const ni=el('input');ni.value=S.name||'';ni.maxLength=16;ni.style.cssText='font-size:18px;padding:6px;border-radius:10px;border:2px solid #ccc;width:150px';
+  ni.addEventListener('change',()=>{S.name=ni.value.trim();save();});nr.appendChild(ni);set.appendChild(nr);
+  const rr=el('div','sw');rr.appendChild(el('span','','Start again from scratch (stars, nest, tricky facts)'));
+  const bk=el('div','sw');bk.appendChild(el('span','','Back up / restore progress'));const bg=el('span','');
+  bg.appendChild(btn('','Back up',()=>{const code=JSON.stringify(S);const done=()=>alert('Progress copied. Paste it into a note to keep it safe.');
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done,()=>prompt('Copy this progress code:',code));else prompt('Copy this progress code:',code);}));
+  bg.appendChild(btn('','Restore',()=>{const code=prompt('Paste a progress code:');if(!code)return;try{const o=JSON.parse(code);if(o&&o.v===1){S=Object.assign(fresh(),o);save();alert('Progress restored.');grownups();}else alert('That code didn’t work.');}catch(e){alert('That code didn’t work.');}}));
+  bk.appendChild(bg);set.appendChild(bk);
+  rr.appendChild(btn('','Reset…',()=>{if(confirm('Delete all stars, baby dinos and tricky-fact history on this device?')){S=fresh();S.name='';save();home();}}));
+  set.appendChild(rr);app.appendChild(set);
+}
+
+(function(){try{const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');x.fillStyle='#7cb342';x.fillRect(0,0,180,180);x.font='120px serif';x.textAlign='center';x.textBaseline='middle';x.fillText('🦕',90,100);const l=document.createElement('link');l.rel='apple-touch-icon';l.href=c.toDataURL('image/png');document.head.appendChild(l);}catch(e){}})();
+window.addEventListener('load',()=>{if(window.speechSynthesis){getVoice();speechSynthesis.onvoiceschanged=()=>{VOICE=null;getVoice();};}});
+home();
+</script>
+</body>
+</html>

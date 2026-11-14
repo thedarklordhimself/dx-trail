@@ -1,0 +1,15 @@
+Museum models (reduced in size for the game):
+  stegosaurus: "Stegosaurus Skeleton" by Artec 3D (CC BY 4.0), https://sketchfab.com/3d-models/dc6e1c748484449587b81426d41da6cb
+  utahraptor: "utahraptor_skeleton" by tech.service.allwe (CC BY 4.0), https://sketchfab.com/3d-models/2ef1135c92854ee0bc234e966adabcc2
+  ichthyosaur: "CCM Ichthyosaur" by Carter County Museum (CC BY 4.0), https://sketchfab.com/3d-models/85fe3715565545669f184761d9dbdbf8
+  amber: "Mosquito in amber" by Loïc Norgeot (CC BY 4.0), https://sketchfab.com/3d-models/53a61d58c09b4d2ab30e269aa3e22078
+  meteorite: "Meteorite" by Hailphilly (CC BY 4.0), https://sketchfab.com/3d-models/0a503e5bec784cbc9082e2f6b2d9f701
+  ammonite: "Ammonite Euaspidoceras paucituberkulatum Arkell" by Virtual Museums of Małopolska (CC0), https://sketchfab.com/3d-models/617f27f8364d4c908ec1c4e94967858f
+  trilobite: "Trilobite: Flexicalymene meeki (PRI 41460)" by Digital Atlas of Ancient Life (CC0), https://sketchfab.com/3d-models/f9196ab8802245988a3542f1eb1c0f3c
+  egg: "Hadrosaurid Fossil Egg" by Peter Nox (CC BY 4.0), https://sketchfab.com/3d-models/c41ed29ca8be4938927bb7c937153095
+  footprint: "Dinosaur footprint" by anthony.romilio (CC BY 4.0), https://sketchfab.com/3d-models/67bde18b4e884d2c9f2e947233465c1e
+  skull: "Tyrannosaurus Rex Skull" by kkp16 (CC BY 4.0), https://sketchfab.com/3d-models/264c680df8a246cf8ead302f99a80941
+  claw: "YPMVPPU.014554.I Antrodemus valens manual ungual" by Yale Peabody Museum (CC BY 4.0), https://sketchfab.com/3d-models/5ffe515c5dae4d59baf5095f4fa9a654
+  trex_standing: "Tyrannosaurus rex skeleton" by marcllobet (CC BY 4.0), https://sketchfab.com/3d-models/9aabc82e228141b2b8bba56849032430
+  triceratops: "Triceratops Skeleton" by toaste (CC BY 4.0), https://sketchfab.com/3d-models/4f4e38e8c70a42f391ed2353a7b4c091
+  pachydome: "Pachycephalosaurus Head Dome" by Carter County Museum (CC BY 4.0), https://sketchfab.com/3d-models/3a7a5989623645b5a58c10bc3f73bfcf
